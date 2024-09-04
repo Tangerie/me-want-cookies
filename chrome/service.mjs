@@ -9,15 +9,16 @@ const onLoad = async (tabId) => {
   })).filter(x => x.domain === "thecavillgroup.agentboxcrm.com.au");
   
   const cookieStr = cookies.map(x => x.name + "=" + x.value).join("; ");
-
+  const csrf = cookies.find(x => x.name == "_csrf")?.value;
   await chrome.scripting.executeScript({
     target: {
       tabId
     },
-    func: (cookieStr) => {
+    func: (cookieStr, csrf) => {
       document.head.setAttribute("__cookie", cookieStr);
+      document.head.setAttribute("__csrf", csrf);
     },
-    args: [ cookieStr ]
+    args: [ cookieStr, csrf ]
   })
 }
 
