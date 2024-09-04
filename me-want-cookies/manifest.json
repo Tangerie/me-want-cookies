@@ -1,5 +1,5 @@
 {
-	"author": "Cookie Engineer",
+	"author": "Tangerie",
 	"name": "me-want-cookies",
 	"version": "0.0.1",
 	"description": "Export all Cookies of the current Tab",
@@ -8,21 +8,18 @@
 		"128": "design/icon-128.png"
 	},
 	"background": {
-		"page": "chrome/background.html",
-		"persistent": true
-	},
-	"browser_action": {
-		"browser_style": false,
-		"default_title": "Export Cookies",
-		"default_popup": "chrome/popup.html",
-		"default_icon": "design/icon-48.png"
-	},
+    	"service_worker": "chrome/service.mjs",
+		"type": "module"
+  	},
 	"permissions": [
 		"cookies",
 		"tabs",
-		"http://*/*",
-		"https://*/*"
+		"scripting",
+		"activeTab"
 	],
-	"manifest_version": 2,
+	"host_permissions": [
+		"https://thecavillgroup.agentboxcrm.com.au/*"
+	],
+	"manifest_version": 3,
 	"offline_enabled": true
 }
