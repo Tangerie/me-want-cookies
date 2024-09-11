@@ -1,4 +1,4 @@
-const onLoad = async (tabId) => {
+const onLoad = async (tabId, domain) => {
   const stores = await chrome.cookies.getAllCookieStores();
   const store = stores.find(x => x.tabIds.includes(tabId));
 
@@ -6,10 +6,15 @@ const onLoad = async (tabId) => {
 
   const cookies = (await chrome.cookies.getAll({
     storeId: store.id
-  })).filter(x => x.domain === "thecavillgroup.agentboxcrm.com.au");
+  })).filter(x => x.domain === domain);
   
   const cookieStr = cookies.map(x => x.name + "=" + x.value).join("; ");
-  const csrf = cookies.find(x => x.name == "_csrf")?.value;
+  let csrf = "";
+  if(domain == "thecavillgroup.agentboxcrm.com.au") {
+    csrf = cookies.find(x => x.name == "_csrf")?.value;
+  } else if (domain == "rpp.corelogic.com.au") {
+    csrf = cookies.find(x => x.name == "APP2SESSION-XSRF")?.value;
+  }
   await chrome.scripting.executeScript({
     target: {
       tabId
@@ -23,7 +28,11 @@ const onLoad = async (tabId) => {
 }
 
 chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
-  if (changeInfo.status == 'complete' && tab.active && tab.url.startsWith("https://thecavillgroup.agentboxcrm.com.au")) {
-    onLoad(tabId);
+  if (changeInfo.status == 'complete' && tab.active) {
+    if(tab.url.startsWith("https://thecavillgroup.agentboxcrm.com.au")) {
+      onLoad(tabId, "thecavillgroup.agentboxcrm.com.au");
+    } else if(tab.url.startsWith("https://rpp.corelogic.com.au")) {
+      onLoad(tabId, "rpp.corelogic.com.au");
+    }
   }
 });
